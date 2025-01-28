@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Financiera</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .logo img {
+            max-width: 150px;
+        }
+
+        h1 {
+            color: #ff4d4d;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        button {
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 12px;
+            width: 100%;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #e60000;
+        }
+
+        .results {
+            margin-top: 20px;
+        }
+
+        .results table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .results th, .results td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .results th {
+            background-color: #ffcccc;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <img src="Caballito curvas.png" alt="Logo">
+        </div>
+        <h1>Calculadora Financiera</h1>
+        <form id="calculatorForm">
+            <label for="amount">Monto:</label>
+            <input type="number" id="amount" placeholder="Ingrese el monto" required>
+
+            <label for="currency">Divisa:</label>
+            <select id="currency">
+                <option value="USD">USD</option>
+                <option value="MXN">MXN</option>
+            </select>
+
+            <label for="downPayment">Enganche (%):</label>
+            <input type="number" id="downPayment" placeholder="Ingrese el porcentaje de enganche" required>
+
+            <label for="rate">Interés anual (%):</label>
+            <input type="number" id="rate" placeholder="Ingrese el interés anual" required>
+
+            <label for="term">Plazo (meses):</label>
+            <input type="number" id="term" placeholder="Número de meses" required>
+
+            <button type="button" onclick="calculatePayments()">Calcular</button>
+        </form>
+        <div class="results" id="results"></div>
+    </div>
+
+    <script>
+        function calculatePayments() {
+            const amount = parseFloat(document.getElementById('amount').value);
+            const downPaymentPercent = parseFloat(document.getElementById('downPayment').value);
+            const rate = parseFloat(document.getElementById('rate').value) / 100 / 12;
+            const term = parseInt(document.getElementById('term').value);
+
+            if (isNaN(amount) || isNaN(downPaymentPercent) || isNaN(rate) || isNaN(term)) {
+                alert('Por favor, complete todos los campos correctamente.');
+                return;
+            }
+
+            const downPayment = (downPaymentPercent / 100) * amount;
+            const loanAmount = amount - downPayment;
+
+            const monthlyPayment = loanAmount * rate / (1 - Math.pow(1 + rate, -term));
+
+            let resultsHTML = '<h2>Resultados</h2>';
+            resultsHTML += '<table>';
+            resultsHTML += '<tr><th>Mes</th><th>Pago Mensual</th><th>Saldo Restante</th></tr>';
+
+            let balance = loanAmount;
+            for (let i = 1; i <= term; i++) {
+                const interest = balance * rate;
+                const principal = monthlyPayment - interest;
+                balance -= principal;
+
+                resultsHTML += `<tr><td>${i}</td><td>${monthlyPayment.toFixed(2)}</td><td>${Math.max(balance, 0).toFixed(2)}</td></tr>`;
+            }
+
+            resultsHTML += '</table>';
+            document.getElementById('results').innerHTML = resultsHTML;
+        }
+    </script>
+</body>
+</html>
